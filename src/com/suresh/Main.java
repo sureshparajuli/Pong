@@ -55,51 +55,7 @@ public class Main {
     static boolean gameOver;      //Used to work out what message, if any, to display on the screen
     static boolean removeInstructions = false;  // Same as above
 
-    private static class GameDisplay extends JPanel {
 
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-
-            //System.out.println("* Repaint *");
-
-            if (gameOver == true) {
-                Color currentColor = g.getColor();//get current color to use later
-                g.setColor(Color.red);//set the color to red
-                g.drawString( "Game over!", 20, 30 );
-                g.drawString("Your score is " + humanScore, 20, 60);
-                g.drawString("Computer score is " + computerScore, 20, 90);
-                g.drawString( "Press space key to restart the game!", 20, 120 );
-                g.setColor(currentColor);//set the color to the one before changing it to red
-                return;
-            }
-
-            if (removeInstructions == false ) {
-                Color currentColor = g.getColor();//get current color to use later
-                g.setColor(Color.orange);//set the color to orange
-                g.drawString("Pong! Press up or down to move", 20, 30);
-                g.drawString("Press q to quit", 20, 60);
-                g.setColor(currentColor);//set the color to the one before changing it to orange
-            }
-
-            g.setColor(Color.blue);
-
-            //While game is playing, these methods draw the ball, paddles, using the global variables
-            //Other parts of the code will modify these variables
-
-            //Ball - a circle is just an oval with the height equal to the width
-            Color currentColor = g.getColor();//get the current color to save for later
-            g.setColor(Color.orange);//change the ball color to orange
-            g.fillOval((int)ballX, (int)ballY, ballSize, ballSize);//fill the ball with orange
-            g.drawOval((int)ballX, (int)ballY, ballSize, ballSize);
-            g.setColor(currentColor);//set the current color
-            //Computer paddle
-            g.drawLine(paddleDistanceFromSide, computerPaddleY - paddleSize, paddleDistanceFromSide, computerPaddleY + paddleSize);
-            //Human paddle
-            g.drawLine(screenSize - paddleDistanceFromSide, humanPaddleY - paddleSize, screenSize - paddleDistanceFromSide, humanPaddleY + paddleSize);
-            
-        }
-    }
 
     static void restartGame() {
         //set the variable to false (reset)
@@ -118,60 +74,7 @@ public class Main {
         timer.start();
         gamePanel.repaint();
     }
-    //Listen for user pressing a key, and moving human paddle in response
-    private static class KeyHandler implements KeyListener {
-        
-        @Override
-        public void keyTyped(KeyEvent ev) {
-            char keyPressed = ev.getKeyChar();
-            char q = 'q';
-            if( keyPressed == q){
-                System.exit(0);    //quit if user presses the q key.
-            }
-        }
 
-        @Override
-        public void keyReleased(KeyEvent ev) {}   //Don't need this one, but required to implement it.
-        
-        @Override
-        public void keyPressed(KeyEvent ev) {
-
-            removeInstructions = true;   //game has started
-
-            if (ev.getKeyCode() == KeyEvent.VK_DOWN) {
-                System.out.println("down key");
-                moveDown();
-            }
-            if (ev.getKeyCode() == KeyEvent.VK_UP) {
-                System.out.println("up key");
-                moveUp();
-            }
-
-            if (ev.getKeyCode() == KeyEvent.VK_SPACE && gameOver == true) {//listen to space bar press after game over
-                System.out.println("space key");
-                restartGame();
-            }
-
-            //ev.getComponent() returns the GUI component that generated this event
-            //In this case, it will be GameDisplay JPanel
-            ev.getComponent().repaint();   //This calls paintComponent(Graphics g) again
-        }
-        
-        private void moveDown() {
-            //Coordinates decrease as you go up the screen, that's why this looks backwards.
-            if (humanPaddleY < screenSize - paddleSize) {
-                humanPaddleY+=humanPaddleMaxSpeed;
-            }
-        }
-        
-        private void moveUp() {
-            //Coordinates increase as you go down the screen, that's why this looks backwards.
-            if (humanPaddleY > paddleSize) {
-                humanPaddleY-=humanPaddleMaxSpeed;
-            }
-        }
-
-    }
 
 
     
