@@ -35,6 +35,9 @@ public class Main {
     
     static double ballSpeed = 5;   //Again, pixels moved per clock tick
 
+    //variable to track score
+    static int humanScore = 0;
+    static int computerScore = 0;
 
     //An angle in radians (which range from 0 to 2xPI (0 to about 6.3).
     //This starts the ball moving down toward the human. Replace with some of the other
@@ -61,13 +64,22 @@ public class Main {
             //System.out.println("* Repaint *");
 
             if (gameOver == true) {
+                Color currentColor = g.getColor();//get current color to use later
+                g.setColor(Color.red);//set the color to red
                 g.drawString( "Game over!", 20, 30 );
+                g.drawString("Your score is " + humanScore, 20, 60);
+                g.drawString("Computer score is " + computerScore, 20, 90);
+                g.drawString( "Press space key to restart the game!", 20, 120 );
+                g.setColor(currentColor);//set the color to the one before changing it to red
                 return;
             }
 
             if (removeInstructions == false ) {
+                Color currentColor = g.getColor();//get current color to use later
+                g.setColor(Color.orange);//set the color to orange
                 g.drawString("Pong! Press up or down to move", 20, 30);
                 g.drawString("Press q to quit", 20, 60);
+                g.setColor(currentColor);//set the color to the one before changing it to orange
             }
 
             g.setColor(Color.blue);
@@ -76,7 +88,11 @@ public class Main {
             //Other parts of the code will modify these variables
 
             //Ball - a circle is just an oval with the height equal to the width
+            Color currentColor = g.getColor();//get the current color to save for later
+            g.setColor(Color.orange);//change the ball color to orange
+            g.fillOval((int)ballX, (int)ballY, ballSize, ballSize);//fill the ball with orange
             g.drawOval((int)ballX, (int)ballY, ballSize, ballSize);
+            g.setColor(currentColor);//set the current color
             //Computer paddle
             g.drawLine(paddleDistanceFromSide, computerPaddleY - paddleSize, paddleDistanceFromSide, computerPaddleY + paddleSize);
             //Human paddle
@@ -85,6 +101,23 @@ public class Main {
         }
     }
 
+    static void restartGame() {
+        //set the variable to false (reset)
+        gameOver = false;
+        removeInstructions = false;
+        //reposition the computerPaddel
+        computerPaddleY = screenSize/2;
+        //reposition the humanPaddel
+        humanPaddleY = screenSize/2;
+        //reset ball position x and y coordination
+        ballX = screenSize/2;
+        ballY=screenSize/2;
+        //set the ball direction
+        ballDirection = Math.PI +1;
+        //start the timer and repaint
+        timer.start();
+        gamePanel.repaint();
+    }
     //Listen for user pressing a key, and moving human paddle in response
     private static class KeyHandler implements KeyListener {
         
@@ -96,7 +129,7 @@ public class Main {
                 System.exit(0);    //quit if user presses the q key.
             }
         }
-        
+
         @Override
         public void keyReleased(KeyEvent ev) {}   //Don't need this one, but required to implement it.
         
@@ -112,6 +145,11 @@ public class Main {
             if (ev.getKeyCode() == KeyEvent.VK_UP) {
                 System.out.println("up key");
                 moveUp();
+            }
+
+            if (ev.getKeyCode() == KeyEvent.VK_SPACE && gameOver == true) {//listen to space bar press after game over
+                System.out.println("space key");
+                restartGame();
             }
 
             //ev.getComponent() returns the GUI component that generated this event
@@ -134,6 +172,7 @@ public class Main {
         }
 
     }
+
 
     
     public static void main(String[] args) {
@@ -224,6 +263,14 @@ public class Main {
 
         if (ballX <= 0 || ballX >= screenSize ) {
             gameOver = true;
+            if(ballX <= 0)
+            {
+                humanScore = humanScore+1;
+            }
+            else
+            {
+                computerScore = computerScore+1;
+            }
             return;
         }
         if (ballY <= 0 || ballY >= screenSize-ballSize) {
